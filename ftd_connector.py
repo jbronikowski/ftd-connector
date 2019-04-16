@@ -45,8 +45,6 @@ class ftd_connection(object):
         image_name=None,
         image_hash=None,
         snort_level=None,
-        verbose=False,
-        debug_level="DEBUG"
     ):
         """This is a python class to help FTD connections."""
         self.ip = ip
@@ -70,7 +68,6 @@ class ftd_connection(object):
         self.global_delay_factor = 1
         self.timeout = 100
         self.buffer_size = 1024
-        self.verbose = verbose
         self.encoding = 'utf-8'
         self.current_output = ''
         self.current_output_clean = ''
@@ -79,17 +76,8 @@ class ftd_connection(object):
         self.prompt = ''
         self.expert_mode_enabled = False
         self.troubleshoot_file_location = ""
-        self.debug_level = debug_level
         self.upgradeErrors = False
         self.logger = logging.getLogger(__name__)
-        if self.verbose:
-            extra = {'ip': self.ip}
-            self.logger.setLevel(self.debug_level)
-            self.c_handler = logging.StreamHandler()
-            self.c_format = logging.Formatter('%(asctime)s - %(ip)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s')
-            self.c_handler.setFormatter(self.c_format)
-            self.logger.addHandler(self.c_handler)
-            self.logger = logging.LoggerAdapter(self.logger, extra)
         self.establish_connection()
         self.establish_channel()
         self.wait_for_inital_prompt()
@@ -166,13 +154,13 @@ class ftd_connection(object):
         #  Logging data to logger
         self.logger.debug("Sending data - %s", send_string)
 
-    def send_wait_for_prompt(self, send_string):
+    def send_wait_for_prompt(self, send_string, timeout=15):
         """Finds prompt then sends string."""
         #  Logging data to logger
         self.logger.info("Sending commnd and will wait for prompt")
         self.find_prompt()
         self.send(send_string)
-        self.expect()
+        self.expect(timeout=timeout)
         return self.current_output_clean
 
     def send_command_clish(self, send_string):
@@ -183,7 +171,7 @@ class ftd_connection(object):
             self.enter_clish_mode()
         return self.send_wait_for_prompt(send_string)
 
-    def send_command_expert(self, send_string):
+    def send_command_expert(self, send_string, timeout=15):
         """Sends command via expert mode"""
         #  Logging data to logger
         self.logger.info("Sending command via Expert")
@@ -191,7 +179,7 @@ class ftd_connection(object):
             #  Logging data to logger
             self.logger.debug("Device in Clish mode")
             self.enter_expert_mode()
-        return self.send_wait_for_prompt(send_string)
+        return self.send_wait_for_prompt(send_string, timeout)
 
     def read_channel(self):
         """Generic handler that will read all the data from session."""

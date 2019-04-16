@@ -23,6 +23,14 @@ __author__ = "Josh Bronikowski <jbroniko@cisco.com>"
 __copyright__ = "Copyright (c) 2019 Cisco and/or its affiliates."
 __license__ = "Cisco Sample Code License, Version 1.1"
 
+# #  Enabling Logging
+logger = logging.getLogger("ftd_connector")
+handler = logging.FileHandler('app.log')
+formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
 
 def ssh_connection(ip_address):
     #  Defining device variables
@@ -36,8 +44,6 @@ def ssh_connection(ip_address):
         "ip": ip_address,
         "username": "admin",
         "password": "C1sco12345",
-        "verbose": True,
-        "debug_level": "DEBUG"
     }
 
     #  Creating connection to device
@@ -55,8 +61,8 @@ try:
     count = 0
     while count < len(ip_addresses):
             for i in xrange(5):
-                    threading.Thread(target=ssh_connection, args=(
-                        str(ip_addresses[count]),)).start()
+                    threading.Thread(target=ssh_connection, name=str(ip_addresses[count].rstrip()), args=(
+                        str(ip_addresses[count].rstrip()),)).start()
                     time.sleep(.3)
                     count += 1
 except Exception as e:
