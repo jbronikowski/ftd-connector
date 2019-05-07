@@ -75,6 +75,7 @@ class ftd_connection(object):
         self.last_match = ''
         self.prompt = ''
         self.expert_mode_enabled = False
+        self.lina_mode_enabled = False
         self.troubleshoot_file_location = ""
         self.upgradeErrors = False
         self.logger = logging.getLogger(__name__)
@@ -169,6 +170,14 @@ class ftd_connection(object):
         self.logger.info("Sending command via Clish")
         if self.expert_mode_enabled:
             self.enter_clish_mode()
+        return self.send_wait_for_prompt(send_string)
+
+    def send_command_lina(self, send_string):
+        """Sends command via lina."""
+        #  Logging data to logger
+        self.logger.info("Sending command via Lina")
+        if not self.lina_mode_enabled:
+            self.enter_lina_mode()
         return self.send_wait_for_prompt(send_string)
 
     def send_command_expert(self, send_string, timeout=15):
@@ -467,6 +476,21 @@ class ftd_connection(object):
             self.expect('.*>.*')
             #  Setting expert_mode_enable as a varible to reference later on
             self.expert_mode_enabled = False
+
+    def enter_lina_mode(self):
+        """This function does the suquence of commnds to enter clish mode"""
+        if not self.lina_mode_enabled:
+            #  Logging data to logger
+            self.logger.info('Entering Lina Mode')
+            self.send('system support diagnostic-cli')
+            self.expect('.*>.*|.*#.*')
+            if '>' in self.current_output:
+                self.send('en')
+                self.expect('.*[pP]assword:.*|.*root@.*')
+                self.send('\n')
+                self.expect('.*#.*')
+            #  Setting expert_mode_enable as a varible to reference later on
+            self.lina_mode_enabled = True
 
     def check_failover_status(self):
         """This function returns failover status from clish."""
