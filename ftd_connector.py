@@ -496,7 +496,7 @@ class ftd_connection(object):
         """This function returns failover status from clish."""
         #  Logging data to logger
         self.logger.info("Checking Failover Status")
-        return self.send_command_clish('show failover | include Failover unit')
+        return self.send_command_clish('show failover | include This host'')
 
     def show_int_brief(self):
         """This function returns interface information from clish."""
