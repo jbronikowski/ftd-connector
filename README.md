@@ -6,7 +6,7 @@ Cisco FTD library to simplify sending and receiving commands from FTDs
 
 
 #### Requires:
-- Python 2.7 
+- Python 2.7
 - Paramiko >= 2.4.2
 
 
@@ -20,12 +20,23 @@ from ftd_connector import ftd_connection
 my_device = {
     "ip": "10.0.0.1",
     "username": "admin",
-    "password": "C1sco12345",
-    "verbose": True,
-    "debug_level": "DEBUG"
+    "password": "C1sco12345"
 }
 
 ```
+#### Enable Logging.
+
+```py
+# #  Enabling Logging
+logger = logging.getLogger("ftd_connector")
+handler = logging.FileHandler('app.log')
+formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
+
+```
+
 
 #### Establish an SSH connection to the device by passing in the device dictionary.
 
@@ -89,9 +100,7 @@ my_device = {
     "remote_password": "C1sco12345",
     "image_name": "Cisco_FTD_Patch-6.2.0.5-38.sh",
     "image_hash": "d906de5be2a19dd7a1c21282aa84636b",
-    "snort_level": "2.9.12",
-    "verbose": True,
-    "debug_level": "DEBUG"
+    "snort_level": "2.9.12"
 }
 
 device = ftd_connection(**my_device)
@@ -141,9 +150,7 @@ my_device = {
     "remote_password": "C1sco12345",
     "image_name": "Cisco_FTD_Patch-6.2.0.5-38.sh",
     "image_hash": "d906de5be2a19dd7a1c21282aa84636b",
-    "snort_level": "2.9.12",
-    "verbose": True,
-    "debug_level": "DEBUG"
+    "snort_level": "2.9.12"
 }
 
 device = ftd_connection(**my_device)
@@ -210,7 +217,7 @@ OSBUILD=42
 
 ```
 
-###### You can return individual config variables 
+###### You can return individual config variables
 ```py
 device.get_device_info('SWVERSION')
 ```

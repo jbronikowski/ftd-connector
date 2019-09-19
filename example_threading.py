@@ -16,6 +16,7 @@ or implied.
 """
 
 from ftd_connector import ftd_connection
+import logging
 import threading
 import time
 
@@ -31,6 +32,8 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
+
+ip_addresses = ['10.0.0.1','10.0.0.2','10.0.0.3']
 
 def ssh_connection(ip_address):
     #  Defining device variables
@@ -50,12 +53,10 @@ def ssh_connection(ip_address):
     device = ftd_connection(**my_device)
 
     #  Sending and storing command via clish
-    output = device.send_command_clish("show failover")
+    #  output = device.send_command_clish("config manager add 10.91.52.247 cisco")
+    output = device.send_command_expert('tail -F /var/log/sf/Cisco_FTD_Upgrade-6.2.3/status.log', timeout=600)
 
-    #  Printing output from device
     print(output)
-
-ip_addresses = ['10.0.0.1', '10.0.0.2', '10.0.0.3']
 
 try:
     count = 0

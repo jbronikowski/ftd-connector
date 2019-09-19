@@ -28,11 +28,9 @@ __license__ = "Cisco Sample Code License, Version 1.1"
 #       param: verbose - default is set to False. This will stdout to shell
 #       param: debug_level - default is DEBUG. Typical python logging levls
 my_device = {
-    "ip": "10.0.0.1",
+    "ip": "10.91.52.248",
     "username": "admin",
-    "password": "C1sco12345",
-    "verbose": False,
-    "debug_level": "DEBUG"
+    "password": "C1sco12345"
 }
 
 #  Creating connection to device
@@ -40,6 +38,10 @@ device = ftd_connection(**my_device)
 
 #  Sending and storing command via clish
 output = device.send_command_clish("show failover")
+
+print(output)
+
+output = device.send_command_expert("ifconfig")
 
 #  Printing output from device
 print(output)

@@ -16,12 +16,18 @@ or implied.
 """
 
 from ftd_connector import ftd_connection
-
+import logging
 
 __author__ = "Josh Bronikowski <jbroniko@cisco.com>"
 __copyright__ = "Copyright (c) 2019 Cisco and/or its affiliates."
 __license__ = "Cisco Sample Code License, Version 1.1"
 
+logger = logging.getLogger("ftd_connector")
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 #  Defining device variables
 #       param: ip
@@ -30,16 +36,16 @@ __license__ = "Cisco Sample Code License, Version 1.1"
 #       param: verbose - default is set to False. This will stdout to shell
 #       param: debug_level - default is DEBUG. Typical python logging levls
 my_device = {
-    "ip": "10.0.0.1",
+    "ip": "10.91.52.151",
     "username": "admin",
-    "password": "C1sco12345",
+    "password": "C1sco12345"
 }
 
 #  Creating connection to device
 device = ftd_connection(**my_device)
 
-#  Get image from http server
-output = device.get_image_from_http('http://10.0.0.2/Cisco_FTD_Patch-6.2.0.5-38.sh')
+#  Sending and storing command via clish
+output = device.send_command_lina("wr standby")
 
 #  Printing output from device
 print(output)

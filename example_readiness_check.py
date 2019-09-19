@@ -45,8 +45,6 @@ my_device = {
     "image_name": "Cisco_FTD_Patch-6.2.0.5-38.sh",
     "image_hash": "d906de5be2a19dd7a1c21282aa84636b",
     "snort_level": "2.9.12",
-    "verbose": True,
-    "debug_level": "DEBUG"
 }
 
 #  Creating connection to device
