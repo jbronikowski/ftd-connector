@@ -99,7 +99,6 @@ class ftd_connection(object):
     def establish_connection(self):
         """Establish a session with client with paramiko."""
         try:
-            print(self.ip)
             self.logger.info("Trying to connect to %s", self.ip)
             # Create a new SSH client object
             self.client = paramiko.client.SSHClient()
@@ -140,6 +139,10 @@ class ftd_connection(object):
         self.channel = self.client.invoke_shell(width=width, height=height)
         return ""
 
+    def disconnect(self):
+        self.logger.info("Disconnecting from %s", self.ip)
+        self.client.close()
+
     def send(self, send_string):
         """Saves and sends the send string provided."""
         self.current_send_string = send_string
@@ -163,13 +166,13 @@ class ftd_connection(object):
         self.expect(timeout=timeout)
         return self.current_output_clean
 
-    def send_command_clish(self, send_string):
+    def send_command_clish(self, send_string, timeout=15):
         """Sends command via clish."""
         #  Logging data to logger
         self.logger.info("Sending command via Clish")
         if self.expert_mode_enabled:
             self.enter_clish_mode()
-        return self.send_wait_for_prompt(send_string)
+        return self.send_wait_for_prompt(send_string, timeout)
 
     def send_command_expert(self, send_string, timeout=15):
         """Sends command via expert mode"""
@@ -217,7 +220,7 @@ class ftd_connection(object):
                             then an exception is raised.
         """
 
-        if len(re_strings) is 0:
+        if len(re_strings) == 0:
             re_strings = '.*{}.*'.format(self.prompt.strip())
 
         # Set the channel timeout
@@ -569,7 +572,7 @@ class ftd_connection(object):
         try:
             #  Trying to find prompt to ensure we know when file is complete
             self.find_prompt()
-            if direction is 'GET':
+            if direction == 'GET':
                 #  Logging data to logger
                 self.logger.info("Getting data {}@{}:{} {}".format(
                                  remote_username, remote_server, remote_path,
@@ -578,7 +581,7 @@ class ftd_connection(object):
                 #  Using the native SCP within FTD
                 self.send("scp -o StrictHostKeyChecking=no {}@{}:{} {}".format(
                     remote_username, remote_server, remote_path, local_path))
-            if direction is 'PUT':
+            if direction == 'PUT':
                 #  Logging data to logger
                 self.logger.info("Sending data {}@{}:{} {}".format(
                     remote_username, remote_server, remote_path, local_path))
@@ -696,7 +699,7 @@ class ftd_connection(object):
         #  Sending command via expert mode
         self.send_command_expert(
             'cat /etc/sf/ims.conf | grep {}'.format(value))
-        if value is '':
+        if value == '':
             return self.current_output_clean
         return self.current_output_clean.split('=')[-1]
 

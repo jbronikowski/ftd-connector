@@ -25,7 +25,7 @@ __copyright__ = "Copyright (c) 2019 Cisco and/or its affiliates."
 __license__ = "Cisco Sample Code License, Version 1.1"
 
 # #  Enabling Logging
-logger = logging.getLogger("ftd_connector")
+logger = logging.getLogger('ftd_connector')
 handler = logging.FileHandler('app.log')
 formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(name)s.%(funcName)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
@@ -33,7 +33,9 @@ logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
 
-ip_addresses = ['10.0.0.1','10.0.0.2','10.0.0.3']
+ip_addresses = ['10.91.52.156', '10.91.52.157', '10.91.52.158', '10.91.52.159', '10.91.52.249']
+sensor_counter = len(ip_addresses)
+print('Total number of sensors: {}\n\n'.format(sensor_counter))
 
 def ssh_connection(ip_address):
     #  Defining device variables
@@ -50,21 +52,24 @@ def ssh_connection(ip_address):
     }
 
     #  Creating connection to device
-    device = ftd_connection(**my_device)
+    with ftd_connection(**my_device) as device:
 
-    #  Sending and storing command via clish
-    #  output = device.send_command_clish("config manager add 10.91.52.247 cisco")
-    output = device.send_command_expert('tail -F /var/log/sf/Cisco_FTD_Upgrade-6.2.3/status.log', timeout=600)
+        #  Sending and storing command via clish
+        #  output = device.send_command_clish("config manager add 10.91.52.247 cisco")
+        output = device.send_command_expert('md5sum /mnt/disk0/.private/startup-config')
+        logger.info("TEST MESSAHE")
+        #  device.disconnect()
+        print(output)
 
-    print(output)
+count = 0
+for ipv4 in ip_addresses:
+    if ipv4:
+        try:
+            print('Connecting to {}... - {} of {}'.format(ipv4, sensor_counter - count, sensor_counter))
+            threading.Thread(target=ssh_connection, name=ipv4, args=(ipv4,)).start()
+        except Exception as error:
+            print(error)
+        finally:
+            time.sleep(.5)
 
-try:
-    count = 0
-    while count < len(ip_addresses):
-            for i in xrange(5):
-                    threading.Thread(target=ssh_connection, name=str(ip_addresses[count].rstrip()), args=(
-                        str(ip_addresses[count].rstrip()),)).start()
-                    time.sleep(.3)
-                    count += 1
-except Exception as e:
-        print(e)
+    count += 1
