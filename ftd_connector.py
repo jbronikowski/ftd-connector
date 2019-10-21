@@ -45,6 +45,7 @@ class ftd_connection(object):
         image_name=None,
         image_hash=None,
         snort_level=None,
+        timeout=15
     ):
         """This is a python class to help FTD connections."""
         self.ip = ip
@@ -55,6 +56,7 @@ class ftd_connection(object):
         self.remote_username = remote_username
         self.remote_password = remote_password
         self.image_name = image_name
+        self.conn_timeout = timeout
         if self.image_name:
             self.image_folder = '-'.join(self.image_name.split('-', 2)[:2])
         self.image_hash = image_hash
@@ -111,7 +113,7 @@ class ftd_connection(object):
             self.client.connect(hostname=self.ip,
                                 username=self.username,
                                 password=self.password,
-                                timeout=10
+                                timeout=self.conn_timeout
                                 )
             self.logger.info("Successfully connected to %s", self.ip)
 
