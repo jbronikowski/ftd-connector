@@ -6,7 +6,7 @@ Cisco FTD library to simplify sending and receiving commands from FTDs
 
 
 #### Requires:
-- Python 2.7
+- Python >= 2.7
 - Paramiko >= 2.4.2
 
 
